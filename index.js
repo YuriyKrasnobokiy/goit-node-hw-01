@@ -1,48 +1,46 @@
-import * as contactService from "./contacts.js";
+// import yargs, { command } from "yargs";
+import { program } from "commander";
 
-const invokeAction = async ({ action, contactId, ...data }) => {
+import * as contactService from "./db/contacts.js";
+
+const invokeAction = async ({ action, id, ...data }) => {
   switch (action) {
     case "list":
       const allContacts = await contactService.listContacts();
-      return console.log(allContacts);
+      return console.table(allContacts);
 
     case "get":
-      const oneContact = await contactService.getContactById(contactId);
+      const oneContact = await contactService.getContactById(id);
       return console.log(oneContact);
 
     case "remove":
-      const removedContact = await contactService.removeContact(contactId);
+      const removedContact = await contactService.removeContact(id);
       return console.log(removedContact);
 
     case "add":
       const newContact = await contactService.addContact(data);
       return console.log(newContact);
 
+    /////////додатково, оновлення контакту////////////
     // case "updateById":
-    //   const updateContact = await contactService.updateContactById(
-    //     contactId,
-    //     data,
-    //   );
+    //   const updateContact = await contactService.updateContactById(id, data);
     //   return console.log(updateContact);
   }
 };
 
-// invokeAction({ action: "list" });
-// invokeAction({ action: "getById", contactId: "drsAJ4SHPYqZeG-83QTVW" });
-// invokeAction({
-//   action: "add",
-//   name: "Test",
-//   email: "test@qa.team",
-//   phone: "(714) 111-1111",
-// });
-// invokeAction({
-//   action: "updateById",
-//   contactId: "fWIIQFmzVkDj3wGfQpAa8",
-//   name: "TestQWQWE",
-//   email: "testQWQWE@qa.team",
-//   phone: "(714) 661-1111",
-// });
-invokeAction({
-  action: "removeById",
-  contactId: "fWIIQFmzVkDj3wGfQpAa8",
-});
+// через yargs
+// const { argv } = yargs(process.argv.slice(2));
+// invokeAction(argv);
+
+// через commander
+program
+  .option("-a, --action <type>")
+  .option("-i, --id <type>")
+  .option("-n, --name <type>")
+  .option("-e, --email <type>")
+  .option("-p, --phone <type>");
+
+program.parse();
+
+const options = program.opts();
+invokeAction(options);
